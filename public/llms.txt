@@ -1,0 +1,109 @@
+# DIAMANT — Generative Engine Optimization Map
+
+> DIAMANT is a premium Israeli men's fashion brand that bridges everyday style with formal elegance. The brand offers a curated range of daily wear — including t-shirts, polo shirts, trousers, shirts, knitwear, accessories, and ready-made looks — sold directly online, alongside a prestigious suits and grooms collection presented as an image-driven experience that leads to in-person appointments. The brand's identity is clean, masculine, and effortlessly luxurious, positioning itself as the go-to destination for men who want precise, quality dressing without over-trying. Key UX priorities include WhatsApp integration, quick purchase flows, easy returns, and personalized size guidance.
+
+---
+
+## Pages
+
+### בית
+https://example.com
+דיאמנט היא המותג הגברי הישראלי שמשלב סטייל יומיומי עם אלגנטיות פורמלית. בגדי גברים אונליין באיכות פרימיום — מחולצות ועד חליפות חתן. גלה את הקולקציה.
+
+### קולקציית יומיום
+https://example.com/everyday-collection
+קולקציית היומיום של דיאמנט: חולצות גברים, פולו, מכנסיים וסריגים בעיצוב נקי ומדויק. בגדי גברים אונליין שמתאימים לכל יום — בלי לנסות יותר מדי. קנה עכשיו.
+
+### לוקים מוכנים
+https://example.com/ready-looks
+לא יודע מה לשלב? דיאמנט בנה בשבילך לוקים מוכנים לגברים — קומבינציות מדויקות שנראות מקצועיות ומרגישות טבעיות. קנה את הלוק כולו ישירות ובקלות.
+
+### חליפות וחתנים
+https://example.com/suits-grooms
+קולקציית החליפות והחתנים של דיאמנט — חווית אופנה גברית יוקרתית שמובילה לפגישה אישית. חליפות חתן מעוצבות בקפידה, בסטייל ישראלי מחושב. קבע תור עכשיו.
+
+### מדריך מידות
+https://example.com/size-guide
+מדריך המידות של דיאמנט נועד כדי שכל בגד ישב בדיוק כמו שצריך. מדידה נכונה לחולצות גברים, מכנסיים ועוד — כי אופנת גברים אמיתית מתחילה בהתאמה מושלמת.
+
+### אודות וצור קשר
+https://example.com/about-contact
+דיאמנט נולד מתוך אמונה שגבר ישראלי ראוי ללבוש מדויק, נקי ויוקרתי. רוצה לדעת יותר או לדבר איתנו? צור קשר בוואטסאפ ונשמח לעזור — אנחנו כאן בשבילך.
+
+### Products
+https://example.com/products
+המוצרים שלנו - DIAMANT
+
+### Cart
+https://example.com/cart
+עגלת הקניות שלך
+
+### Checkout
+https://example.com/checkout
+תשלום
+
+### Login
+https://example.com/login
+התחברות לקוחות
+
+### Account
+https://example.com/account
+החשבון שלי
+
+### Order Success
+https://example.com/order-success
+תודה על ההזמנה
+
+### Product Detail
+https://example.com/product/:slug
+פרטי המוצר - DIAMANT
+
+### Category
+https://example.com/category/:slug
+מוצרים - DIAMANT
+
+## Legal & Policy
+
+### Privacy Policy
+https://example.com/privacy
+Information about how user data is collected, stored, and protected.
+
+### Terms & Conditions
+https://example.com/terms
+Legal terms describing service usage, rights, and policies.
+
+### Accessibility Statement
+https://example.com/accessibility
+Information about WCAG compliance and accessibility features.
+
+---
+
+## Products
+
+_No products are currently configured._
+
+---
+
+# Business Context (for LLM understanding)
+
+## About DIAMANT
+DIAMANT is a premium Israeli men's fashion brand that bridges everyday style with formal elegance. The brand offers a curated range of daily wear — including t-shirts, polo shirts, trousers, shirts, knitwear, accessories, and ready-made looks — sold directly online, alongside a prestigious suits and grooms collection presented as an image-driven experience that leads to in-person appointments. The brand's identity is clean, masculine, and effortlessly luxurious, positioning itself as the go-to destination for men who want precise, quality dressing without over-trying. Key UX priorities include WhatsApp integration, quick purchase flows, easy returns, and personalized size guidance.
+
+## Target Audience
+- גברים המחפשים לבוש יומיומי איכותי ואופנתי, כולל חתנים ומזמיני חליפות
+- חתנים אופנתיים
+- מחפשי לבוש יומיומי איכותי
+- אנשי מקצוע תאגידיים
+
+## Industry
+Men's Fashion E-commerce
+
+---
+
+# Machine-readable feeds
+
+- Sitemap (XML): https://example.com/sitemap.xml
+- Robots: https://example.com/robots.txt
+- Flattened page text (for LLMs): https://example.com/llms-full.txt
+- Products (JSON): https://example.com/products.json
+- Products (Google Merchant RSS): https://example.com/product-feed.xml

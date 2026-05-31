@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <title>תמיד המידה המדויקת שלך — DIAMANT</title>
+    <meta name="description" content="מדריך המידות של דיאמנט נועד כדי שכל בגד ישב בדיוק כמו שצריך. מדידה נכונה לחולצות גברים, מכנסיים ועוד — כי אופנת גברים אמיתית מתחילה בהתאמה מושלמת.">
+    <meta name="keywords" content="מדריך מידות גברים, מידות בגדים גברים, חולצות גברים, מכנסיים לגברים, התאמת מידה אונליין">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Zappy Analytics -->
+<script>
+(function() {
+  'use strict';
+  
+  // Configuration
+  var config = {
+    websiteId: '95004153-1f2c-4575-952a-ba38ce5904a4',
+    apiUrl: 'https://api.zappy5.com/api/analytics/track',
+    sessionDuration: 30 * 60 * 1000, // 30 minutes
+    visitorDuration: 30 * 24 * 60 * 60 * 1000, // 30 days
+    trackPageViews: true,
+    trackClicks: true,
+    trackFormSubmissions: true
+  };
+  
+  // Generate or retrieve persistent visitor ID (30 days)
+  function getVisitorId() {
+    var visitorKey = 'zappy_visitor_' + config.websiteId;
+    var visitor = null;
+    
+    try {
+      visitor = localStorage.getItem(visitorKey);
+      if (visitor) {
+        var visitorData = JSON.parse(visitor);
+        var now = Date.now();
+        
+        // Check if visitor ID is still valid (30 days)
+        if (now - visitorData.created < config.visitorDuration) {
+          // Update last seen timestamp
+          visitorData.lastSeen = now;
+          localStorage.setItem(visitorKey, JSON.stringify(visitorData));
+          return visitorData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: LocalStorage not available');
+    }
+    
+    // Generate new visitor ID
+    var newVisitorId = 'zv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      localStorage.setItem(visitorKey, JSON.stringify({
+        id: newVisitorId,
+        created: Date.now(),
+        lastSeen: Date.now()
+      }));
+    } catch (e) {
+      // Continue without local storage
+    }
+    
+    return newVisitorId;
+  }
+  
+  // Generate or retrieve session ID (30 minutes)
+  function getSessionId() {
+    var sessionKey = 'zappy_session_' + config.websiteId;
+    var session = null;
+    
+    try {
+      session = sessionStorage.getItem(sessionKey);
+      if (session) {
+        var sessionData = JSON.parse(session);
+        var now = Date.now();
+        
+        // Check if session is still valid
+        if (now - sessionData.timestamp < config.sessionDuration) {
+          // Update timestamp
+          sessionData.timestamp = now;
+          sessionStorage.setItem(sessionKey, JSON.stringify(sessionData));
+          return sessionData.id;
+        }
+      }
+    } catch (e) {
+      console.warn('Zappy Analytics: SessionStorage not available');
+    }
+    
+    // Generate new session ID
+    var newSessionId = 'zs_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    try {
+      sessionStorage.setItem(sessionKey, JSON.stringify({
+        id: newSessionId,
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      // Continue without session storage
+    }
+    
+    return newSessionId;
+  }
+  
+  var visitorId = getVisitorId();
+  var sessionId = getSessionId();
+  
+  // Track an event
+  function trackEvent(eventType, data) {
+    data = data || {};
+    
+    var eventData = {
+      website_id: config.websiteId,
+      event_type: eventType,
+      page_path: window.location.pathname,
+      referrer: document.referrer || 'direct',
+      visitor_id: visitorId,
+      session_id: sessionId,
+      metadata: data
+    };
+    
+    // Use sendBeacon if available (better for page unload events)
+    if (navigator.sendBeacon) {
+      var blob = new Blob([JSON.stringify(eventData)], { type: 'application/json' });
+      navigator.sendBeacon(config.apiUrl, blob);
+    } else {
+      // Fallback to fetch
+      fetch(config.apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(eventData),
+        keepalive: true
+      }).catch(function(error) {
+        console.warn('Zappy Analytics: Failed to track event', error);
+      });
+    }
+  }
+  
+  // Track page view
+  if (config.trackPageViews) {
+    trackEvent('pageview', {
+      title: document.title,
+      url: window.location.href
+    });
+  }
+  
+  // Track clicks on important elements
+  if (config.trackClicks) {
+    document.addEventListener('click', function(e) {
+      var target = e.target;
+      
+      // Track button clicks (counted as actions)
+      if (target.tagName === 'BUTTON' || target.closest('button')) {
+        var button = target.tagName === 'BUTTON' ? target : target.closest('button');
+        trackEvent('click', {
+          element: 'button',
+          text: button.textContent.trim().substring(0, 100),
+          id: button.id || null,
+          class: button.className || null
+        });
+      }
+      
+      // Track link clicks (navigation - not counted as actions)
+      else if (target.tagName === 'A' || target.closest('a')) {
+        var link = target.tagName === 'A' ? target : target.closest('a');
+        trackEvent('navigation', {
+          element: 'link',
+          text: link.textContent.trim().substring(0, 100),
+          href: link.href,
+          external: link.hostname !== window.location.hostname
+        });
+      }
+    }, true);
+  }
+  
+  // Track form submissions
+  if (config.trackFormSubmissions) {
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      
+      trackEvent('form_submit', {
+        form_id: form.id || null,
+        form_name: form.name || null,
+        form_action: form.action || null,
+        form_method: form.method || 'GET'
+      });
+    }, true);
+  }
+  
+  // Track time on page (send on page unload)
+  var pageLoadTime = Date.now();
+  
+  window.addEventListener('beforeunload', function() {
+    var timeOnPage = Math.floor((Date.now() - pageLoadTime) / 1000); // in seconds
+    
+    trackEvent('page_unload', {
+      time_on_page: timeOnPage,
+      page_path: window.location.pathname
+    });
+  });
+  
+  // Expose tracking function globally for custom events
+  window.zappyAnalytics = {
+    track: trackEvent,
+    getVisitorId: function() { return visitorId; },
+    getSessionId: function() { return sessionId; }
+  };
+  
+})();
+</script>
+<!-- End Zappy Analytics -->
+    <meta property="og:title" content="תמיד המידה המדויקת שלך — DIAMANT">
+    <meta property="og:description" content="מדריך המידות של דיאמנט נועד כדי שכל בגד ישב בדיוק כמו שצריך. מדידה נכונה לחולצות גברים, מכנסיים ועוד — כי אופנת גברים אמיתית מתחילה בהתאמה מושלמת.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="תמיד המידה המדויקת שלך — DIAMANT">
+    <meta name="twitter:description" content="מדריך המידות של דיאמנט נועד כדי שכל בגד ישב בדיוק כמו שצריך. מדידה נכונה לחולצות גברים, מכנסיים ועוד — כי אופנת גברים אמיתית מתחילה בהתאמה מושלמת.">
+    <meta property="og:type" content="website">
+  <meta property="og:locale" content="he_IL">
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .skip-link { position: absolute; top: 0; left: 0; transform: translateY(-200%); padding: 12px 18px; background: var(--bg-dark, #1a1a1a); color: var(--text-light, #fff); font-weight: 600; border-radius: 0 0 8px 0; z-index: 10000; }
+    .skip-link:focus { transform: none; outline: 2px solid var(--ring, #fff); outline-offset: 2px; }
+    :focus-visible { outline: 2px solid var(--ring, currentColor); outline-offset: 3px; }
+  </style>
+
+
+  
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/assets/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/favicon-512x512.png">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <!-- Cookie Consent -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.css" />
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-cookieconsent@3/dist/cookieconsent.umd.js"></script>
+    <!-- Mickidum Accessibility Toolbar -->
+    <script src="https://cdn.jsdelivr.net/gh/mickidum/acc_toolbar/acctoolbar/acctoolbar.min.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+
+    <style id="zappy-dropdown-submenu-styles">
+      /* ========== DESKTOP DROPDOWN SUBMENU STYLES ========== */
+      /* Base styles for dropdown submenus - parent must be positioned */
+      .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { position: relative; }
+      /* Submenu base - hidden by default */
+      .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { display: block !important; position: absolute !important; top: 100%; left: 0; min-width: 220px; background: white; border-radius: 8px; box-shadow: 0 8px 25px rgba(0,0,0,0.15); padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s ease; z-index: 1000; list-style: none; pointer-events: none; }
+      /* CRITICAL: Desktop hover styles to show dropdown */
+      .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Submenu item styling */
+      .sub-menu li { list-style: none; margin: 0; padding: 0; }
+      .sub-menu a { display: block !important; padding: 10px 16px !important; color: var(--text-dark, #333) !important; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background-color 0.2s; }
+      .sub-menu .zappy-nav-child > a { padding-left: 28px !important; font-size: 0.9em !important; opacity: 0.85 !important; }
+      [dir="rtl"] .sub-menu .zappy-nav-child > a, html[lang="he"] .sub-menu .zappy-nav-child > a, html[lang="ar"] .sub-menu .zappy-nav-child > a { padding-left: 10px !important; padding-right: 28px !important; }
+      .sub-menu .zappy-nav-parent > a { font-weight: 600 !important; }
+      .sub-menu a:hover { background-color: #f5f5f5; }
+      /* RTL (Hebrew/Arabic) dropdown positioning */
+      [dir="rtl"] .nav-menu .sub-menu, [dir="rtl"] nav .sub-menu, [dir="rtl"] .navbar .sub-menu, html[lang="he"] .nav-menu .sub-menu, html[lang="he"] nav .sub-menu, html[lang="he"] .navbar .sub-menu, html[lang="ar"] .nav-menu .sub-menu, html[lang="ar"] nav .sub-menu, html[lang="ar"] .navbar .sub-menu { left: auto !important; right: 0 !important; }
+      /* Hide empty dropdown menus (exclude catalog sub-menus that use <a> children instead of <li>) */
+      .sub-menu:empty, .sub-menu:not(:has(li:not(.zappy-hidden-menu-item))):not(:has(> a)), .sub-menu:not(:has(li)):not(:has(> a)) { display: none !important; opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; }
+      /* Desktop: show submenu on Menu Group hover */
+      li:has(.menu-group-title):hover > .sub-menu { opacity: 1 !important; visibility: visible !important; transform: translateY(0) !important; pointer-events: auto !important; }
+      /* Menu Group title styling */
+      .nav-menu > li > .menu-group-title, #navMenu > li > .menu-group-title { display: inline-block; padding: 0.5rem 1rem; cursor: default; user-select: none; }
+      
+      /* ========== MOBILE SUBMENU STYLES ========== */
+      @media (max-width: 768px) {
+        .nav-menu .sub-menu, nav .sub-menu, .navbar .sub-menu, #navMenu .sub-menu { position: static !important; transform: none !important; box-shadow: none !important; background: transparent !important; max-height: 0; overflow: hidden; opacity: 0; visibility: hidden; transition: max-height 0.3s ease, opacity 0.3s ease; padding: 0 !important; border-radius: 0 !important; }
+        .navbar .sub-menu.mobile-expanded, .nav-menu .sub-menu.mobile-expanded, #navMenu .sub-menu.mobile-expanded { max-height: none !important; overflow-y: visible !important; opacity: 1 !important; visibility: visible !important; padding: 8px 0 8px 16px !important; }
+        [dir="rtl"] .sub-menu.mobile-expanded, html[lang="he"] .sub-menu.mobile-expanded { padding: 8px 16px 8px 0 !important; }
+        /* Disable hover behavior on mobile */
+        .nav-menu li:hover > .sub-menu, nav li:hover > .sub-menu, .navbar li:hover > .sub-menu, #navMenu li:hover > .sub-menu { opacity: 0; visibility: hidden; pointer-events: none; }
+        .nav-menu li > .sub-menu.mobile-expanded, nav li > .sub-menu.mobile-expanded, .navbar li > .sub-menu.mobile-expanded, #navMenu li > .sub-menu.mobile-expanded { opacity: 1 !important; visibility: visible !important; pointer-events: auto !important; }
+        .nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu) { display: flex !important; flex-wrap: wrap !important; align-items: center !important; position: relative !important; min-height: 44px !important; }
+        .nav-menu li:has(.sub-menu) > a, nav li:has(.sub-menu) > a, .navbar li:has(.sub-menu) > a, #navMenu li:has(.sub-menu) > a { flex: 1 !important; min-width: 0 !important; }
+        .nav-menu li:has(.sub-menu) > .menu-group-title, nav li:has(.sub-menu) > .menu-group-title, .navbar li:has(.sub-menu) > .menu-group-title, #navMenu li:has(.sub-menu) > .menu-group-title { flex: 1 !important; min-width: 0 !important; padding: 0 !important; line-height: inherit !important; }
+        .nav-menu li:has(.sub-menu) > .sub-menu, nav li:has(.sub-menu) > .sub-menu, .navbar li:has(.sub-menu) > .sub-menu, #navMenu li:has(.sub-menu) > .sub-menu { flex-basis: 100% !important; width: 100% !important; }
+        .nav-menu li:has(.sub-menu) > a [class*="chevron"], .nav-menu li:has(.sub-menu) > a [class*="arrow"], .nav-menu li:has(.sub-menu) > a .fa-chevron-down, .nav-menu li:has(.sub-menu) > a .fa-angle-down, nav li:has(.sub-menu) > a [class*="chevron"], nav li:has(.sub-menu) > a [class*="arrow"], #navMenu li:has(.sub-menu) > a [class*="chevron"], #navMenu li:has(.sub-menu) > a [class*="arrow"] { display: none !important; visibility: hidden !important; }
+        .mobile-submenu-toggle { display: flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: auto !important; background: transparent !important; border: none !important; cursor: pointer !important; color: var(--text-dark) !important; position: static !important; flex-shrink: 0 !important; align-self: stretch !important; z-index: 2 !important; padding: 0 !important; margin: 0 !important; }
+        .mobile-submenu-toggle::after { content: '' !important; width: 0 !important; height: 0 !important; border-left: 6px solid transparent !important; border-right: 6px solid transparent !important; border-top: 7px solid currentColor !important; transition: transform 0.3s ease !important; }
+        .mobile-submenu-toggle.expanded::after { transform: rotate(180deg) !important; }
+        .sub-menu a { padding: 10px 0 !important; display: block !important; color: var(--text-dark) !important; white-space: normal !important; }
+        .sub-menu .zappy-nav-child > a { padding-left: 28px !important; font-size: 0.9em !important; opacity: 0.85 !important; }
+        [dir="rtl"] .sub-menu .zappy-nav-child > a, html[lang="he"] .sub-menu .zappy-nav-child > a, html[lang="ar"] .sub-menu .zappy-nav-child > a { padding-left: 0 !important; padding-right: 28px !important; }
+        .sub-menu .zappy-nav-parent > a { font-weight: 600 !important; }
+        .nav-menu.active, #navMenu.active { max-width: 100vw !important; overflow-x: hidden !important; box-sizing: border-box !important; }
+        .navbar .sub-menu li a, nav.navbar .sub-menu li a, .zappy-products-dropdown .sub-menu a { color: var(--text-dark) !important; }
+      }
+      @media (min-width: 769px) { .mobile-submenu-toggle { display: none !important; } }
+    </style>
+
+    <style id="zappy-widget-visibility">
+      html[dir="rtl"] .whatsapp-float { right: 20px !important; left: auto !important; }
+      html[dir="ltr"] .whatsapp-float, html:not([dir]) .whatsapp-float { left: 20px !important; right: auto !important; }
+      html[dir="rtl"] #mic-access-tool-general-button, html[dir="rtl"] .mic-access-tool-general-button,
+      html[dir="rtl"] #mic-init-access-tool .mic-access-tool-general-button,
+      html[dir="rtl"] #mic-init-access-tool #mic-access-tool-general-button,
+      html[dir="rtl"] ._access-icon { left: 20px !important; right: auto !important; }
+      html[dir="ltr"] #mic-access-tool-general-button, html[dir="ltr"] .mic-access-tool-general-button,
+      html[dir="ltr"] #mic-init-access-tool .mic-access-tool-general-button,
+      html[dir="ltr"] #mic-init-access-tool #mic-access-tool-general-button,
+      html[dir="ltr"] ._access-icon,
+      html:not([dir]) #mic-access-tool-general-button, html:not([dir]) .mic-access-tool-general-button,
+      html:not([dir]) #mic-init-access-tool .mic-access-tool-general-button,
+      html:not([dir]) #mic-init-access-tool #mic-access-tool-general-button,
+      html:not([dir]) ._access-icon { right: 20px !important; left: auto !important; }
+      @media (max-width: 768px) { .whatsapp-float { display: flex !important; } }
+      @media (min-width: 769px) { .whatsapp-float { display: flex !important; } }
+      @media (max-width: 768px) {
+        #mic-access-tool-general-button, .mic-access-tool-general-button,
+        #mic-init-access-tool .mic-access-tool-general-button, #mic-init-access-tool #mic-access-tool-general-button,
+        ._access-icon { display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
+        #mic-access-tool-box.opened-mic-access-tool, .mic-access-tool-box.opened-mic-access-tool,
+        #mic-init-access-tool #mic-access-tool-box.opened-mic-access-tool {
+          visibility: visible !important; opacity: 1 !important; pointer-events: auto !important;
+        }
+      }
+      @media (min-width: 769px) {
+        #mic-access-tool-general-button, .mic-access-tool-general-button,
+        #mic-init-access-tool .mic-access-tool-general-button, #mic-init-access-tool #mic-access-tool-general-button,
+        ._access-icon { display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; }
+        #mic-access-tool-box.opened-mic-access-tool, .mic-access-tool-box.opened-mic-access-tool,
+        #mic-init-access-tool #mic-access-tool-box.opened-mic-access-tool {
+          visibility: visible !important; opacity: 1 !important; pointer-events: auto !important;
+        }
+      }
+    </style>
+</head>
+<body>
+
+
+    <div class="mobile-search-panel" id="mobile-search-panel">
+      <div class="search-wrapper">
+        <input type="text" id="mobile-search-input" placeholder="חיפוש מוצרים..." autocomplete="off">
+        <button class="search-submit" id="mobile-search-submit" title="חיפוש">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        </button>
+        <button class="close-search" id="close-mobile-search">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="search-results" id="mobile-search-results"></div>
+    </div>
+  
+<script>window.ZAPPY_WEBSITE_ID = "95004153-1f2c-4575-952a-ba38ce5904a4";window.ZAPPY_API_BASE = "https://api.zappy5.com";</script><a class="skip-link" href="#main">דלג לתוכן הראשי</a>
+  <nav class="navbar" dir="rtl">
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">
+    <svg class="hamburger-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M3 12h18M3 6h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+    <svg class="close-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;">
+      <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+    </svg>
+  </button>
+
+  <button class="phone-header-btn" data-phone="[business_phone]" aria-label="Call">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+    </svg>
+  </button>
+
+  <div class="nav-container">
+    <div class="nav-right-group"><div class="nav-brand">
+      <a href="/" class="logo-link"><img class="logo" src="/assets/site-------------image-1.webp" alt="DIAMANT"></a>
+    </div><ul class="nav-menu" id="navMenu">
+
+    <li class="menu-item-has-children zappy-products-dropdown">
+      <a href="/products">
+        מוצרים
+        <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 9l6 6 6-6"></path>
+        </svg>
+      </a>
+      <ul class="sub-menu" id="zappy-nav-category-links">
+        <li><a href="/products" data-i18n="ecom_products">מוצרים</a></li>
+        <!-- Categories will be loaded dynamically -->
+      </ul>
+    </li>
+  <li><a href="/">בית</a></li><li><a href="/everyday-collection">קולקציית יומיום</a></li><li><a href="/ready-looks">לוקים מוכנים</a></li><li><a href="/suits-grooms">חליפות וחתנים</a></li><li><a href="/size-guide">מדריך מידות</a></li><li><a href="/about-contact">אודות וצור קשר</a></li></ul><div class="nav-ecommerce-icons nav-icons-left"><a href="/login" class="login-link nav-login" title="התחברות"><svg class="login-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></a><a href="#cart" class="cart-link nav-cart" id="cart-drawer-toggle" title="עגלת קניות"><svg class="cart-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-count">0</span></a><div class="nav-search-box">
+    <input type="text" class="nav-search-input" id="nav-search-input" placeholder="חיפוש מוצרים..." autocomplete="off">
+    <button class="nav-search-btn" id="nav-search-btn" title="חיפוש">
+      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </button>
+    <div class="nav-search-results" id="nav-search-results"></div>
+  </div></div><div class="nav-ecommerce-icons nav-icons-right"><button class="nav-search-toggle" id="mobile-search-toggle" title="חיפוש"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg></button></div></div>
+
+    
+
+    
+  </div>
+</nav>
+
+    <nav class="zappy-catalog-menu rtl" id="zappy-catalog-menu" dir="rtl" style="display:none">
+      <div class="catalog-menu-container">
+        <a href="/products" class="catalog-menu-item catalog-menu-all">מוצרים</a>
+        <div class="catalog-menu-categories" id="zappy-category-links">
+          <!-- Categories will be loaded dynamically -->
+        </div>
+      </div>
+    </nav>
+  
+<script>
+
+// Navbar Mobile Menu Toggle and Contrast Fix
+(function() {
+  // Use 'load' event instead of 'DOMContentLoaded' to ensure we run AFTER all other scripts
+  window.addEventListener('load', function() {
+    
+    // FIX MOBILE BUTTON CONTRAST
+    // Detect navbar background color and apply contrasting color to mobile buttons
+    const navbar = document.querySelector('.navbar, nav, header');
+    if (!navbar) {
+      console.log('[Navbar] Navbar element not found');
+      return;
+    }
+    
+    // DECLARE VARIABLES EARLY to avoid Temporal Dead Zone errors
+    // These are used in multiple places below
+    let mobileToggle = document.getElementById('mobileToggle') ||
+                       document.querySelector('.mobile-toggle') ||
+                       document.querySelector('.hamburger') ||
+                       document.querySelector('.hamburger-menu') ||
+                       document.querySelector('.menu-toggle') ||
+                       document.querySelector('.burger-menu') ||
+                       document.querySelector('[aria-label="Menu"]') ||
+                       document.querySelector('[aria-label="תפריט"]');
+    
+    const phoneBtn = document.querySelector('.phone-header-btn');
+    
+    const computedStyle = window.getComputedStyle(navbar);
+    let bgColor = computedStyle.backgroundColor;
+    
+    console.log('[Navbar] Initial navbar background:', bgColor);
+    
+    // Check if background is transparent or rgba with 0 alpha
+    const isTransparent = bgColor === 'transparent' || 
+                         bgColor === 'rgba(0, 0, 0, 0)' ||
+                         (bgColor.startsWith('rgba') && bgColor.includes(', 0)'));
+    
+    if (isTransparent) {
+      // Check for background-image or gradient
+      const bgImage = computedStyle.backgroundImage;
+      if (bgImage && bgImage !== 'none') {
+        console.log('[Navbar] Navbar has background image/gradient, using dark text');
+        bgColor = 'rgb(240, 240, 240)'; // Assume light background
+      } else {
+        // Transparent navbar - check body background
+        const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+        console.log('[Navbar] Navbar transparent, using body background:', bodyBg);
+        bgColor = bodyBg;
+      }
+    }
+    
+    // Calculate luminance to determine if background is light or dark
+    const rgb = bgColor.match(/\d+/g);
+    if (rgb && rgb.length >= 3) {
+      const r = parseInt(rgb[0]);
+      const g = parseInt(rgb[1]);
+      const b = parseInt(rgb[2]);
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      
+      // Mobile button colors are set by Claude's AI-generated CSS (same as .nav-menu a)
+      // No dynamic color overrides needed - colors come from the generated navbar CSS
+      console.log('[Navbar] Mobile button colors preserved from Claude CSS (luminance:', luminance.toFixed(2) + ')');
+      
+      // FIX ICON SIZES - Ensure SVGs are properly sized and visible
+      // INJECT CRITICAL CSS TO OVERRIDE ANY CONFLICTING RULES
+      const criticalCSS = document.createElement('style');
+      criticalCSS.id = 'zappy-mobile-nav-fix';
+      const htmlLang = document.documentElement.lang || 'en';
+      const htmlDir = document.documentElement.dir || 'ltr';
+      // Check both dir attribute AND lang for RTL detection
+      // dir="rtl" is the most reliable indicator
+      const isRTL = htmlDir === 'rtl' || htmlLang === 'he' || htmlLang === 'ar';
+      
+      criticalCSS.textContent = `
+        /* Hide mobile buttons on desktop, show only on mobile */
+        @media (min-width: 769px) {
+          .mobile-toggle,
+          .phone-header-btn {
+            display: none !important;
+          }
+        }
+        
+        /* Show and position mobile buttons correctly on mobile */
+        @media (max-width: 768px) {
+          .navbar,
+          nav.navbar {
+            min-height: 70px !important;
+          }
+
+          .mobile-toggle,
+          .phone-header-btn {
+            position: absolute !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            margin-top: auto !important;
+            margin-bottom: auto !important;
+            transform: none !important;
+            z-index: 1001 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 36px !important;
+            height: 36px !important;
+            border-radius: 50% !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 6px !important;
+            background: none !important;
+            color: var(--nav-text, var(--text-dark)) !important;
+            touch-action: manipulation !important;
+            -webkit-tap-highlight-color: transparent !important;
+          }
+
+          html[data-zappy-site-type="ecommerce"] .phone-header-btn,
+          body[data-zappy-site-type="ecommerce"] .phone-header-btn,
+          html[data-zappy-site-type="ecommerce"] header .phone-header-btn,
+          html[data-zappy-site-type="ecommerce"] nav .phone-header-btn {
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            min-width: 0 !important;
+            overflow: hidden !important;
+          }
+          
+          /* LTR positioning (default): hamburger LEFT, phone RIGHT */
+          html:not([dir="rtl"]):not([lang="he"]):not([lang="ar"]) .mobile-toggle,
+          html[dir="ltr"] .mobile-toggle {
+            left: 12px !important;
+            right: auto !important;
+          }
+          html:not([dir="rtl"]):not([lang="he"]):not([lang="ar"]) .phone-header-btn,
+          html[dir="ltr"] .phone-header-btn {
+            right: 12px !important;
+            left: auto !important;
+          }
+          
+          /* RTL positioning: hamburger RIGHT, phone LEFT */
+          html[dir="rtl"] .mobile-toggle,
+          html[lang="he"] .mobile-toggle,
+          html[lang="ar"] .mobile-toggle {
+            right: 12px !important;
+            left: auto !important;
+          }
+          html[dir="rtl"] .phone-header-btn,
+          html[lang="he"] .phone-header-btn,
+          html[lang="ar"] .phone-header-btn {
+            left: 12px !important;
+            right: auto !important;
+          }
+          
+          /* CRITICAL: Ensure nav-container has min-height on mobile */
+          /* All children are positioned absolutely/fixed on mobile, so height:auto collapses to 0 */
+          .nav-container {
+            min-height: 70px !important;
+            position: relative !important;
+          }
+          
+          /* Ensure SVG icons are properly sized and inherit color */
+          .mobile-toggle svg,
+          .phone-header-btn svg {
+            width: 24px !important;
+            height: 24px !important;
+            /* Don't force display - let JavaScript control hamburger/close toggle */
+          }
+          
+          /* Reset nav-cta-container on mobile - remove desktop box-shadow/padding */
+          /* that creates a visible ghost box when CTA button is hidden */
+          .nav-cta-container {
+            box-shadow: none !important;
+            padding: 0 !important;
+          }
+          
+          /* Hide nav-cta-container entirely on mobile when there's no lang-switcher */
+          /* (only the CTA button is inside, and it's hidden on mobile) */
+          .nav-cta-container:not(:has(.lang-switcher)) {
+            display: none !important;
+          }
+          
+          /* CRITICAL: Prevent hero image fade gradient from bleeding over headline text */
+          /* The .image-fade-gradient has bottom: -30px (extends below parent) */
+          /* On mobile stacked layout, this overlaps the h1 text below the image */
+          .hero-image-column {
+            overflow: hidden !important;
+          }
+          .image-fade-gradient {
+            bottom: 0 !important;
+          }
+          
+          /* Hide desktop language switcher on mobile - hamburger menu handles it */
+          /* High specificity to override stored CSS */
+          .lang-switcher,
+          .nav-cta-container .lang-switcher,
+          .nav-container .lang-switcher,
+          .navbar .lang-switcher,
+          .navbar .nav-cta-container .lang-switcher {
+            display: none !important;
+          }
+        }
+      `;
+      
+      // Remove existing fix if present and inject new one
+      const existing = document.getElementById('zappy-mobile-nav-fix');
+      if (existing) existing.remove();
+      document.head.appendChild(criticalCSS);
+      
+      console.log('[Navbar] Critical CSS injected for mobile nav positioning');
+      
+      // ONLY apply inline positioning styles on mobile viewport
+      // On desktop, the CSS handles hiding these buttons with display: none
+      // Inline styles were breaking desktop layout by overriding CSS
+      const isMobileViewport = window.innerWidth <= 768;
+      
+      if (mobileToggle) {
+        // Icon sizing applies to all viewports for consistency
+        const hamburgerIcon = mobileToggle.querySelector('.hamburger-icon');
+        const closeIcon = mobileToggle.querySelector('.close-icon');
+        
+        if (hamburgerIcon) {
+          hamburgerIcon.style.setProperty('width', '24px', 'important');
+          hamburgerIcon.style.setProperty('height', '24px', 'important');
+          hamburgerIcon.style.setProperty('display', 'block', 'important'); // Show hamburger by default
+        }
+        if (closeIcon) {
+          closeIcon.style.setProperty('width', '24px', 'important');
+          closeIcon.style.setProperty('height', '24px', 'important');
+          closeIcon.style.setProperty('display', 'none', 'important'); // Hide close icon by default
+        }
+        
+        // ONLY set positioning inline styles on mobile
+        if (isMobileViewport) {
+          mobileToggle.style.setProperty('position', 'absolute', 'important');
+          mobileToggle.style.setProperty('top', '0', 'important');
+          mobileToggle.style.setProperty('bottom', '0', 'important');
+          mobileToggle.style.setProperty('margin-top', 'auto', 'important');
+          mobileToggle.style.setProperty('margin-bottom', 'auto', 'important');
+          mobileToggle.style.setProperty('transform', 'none', 'important');
+          mobileToggle.style.setProperty('z-index', '1001', 'important');
+          
+          // Clear any inline left/right so CSS can take over based on html[dir]
+          mobileToggle.style.removeProperty('left');
+          mobileToggle.style.removeProperty('right');
+          
+          console.log('[Navbar] Mobile toggle positioning applied (mobile viewport)');
+        } else {
+          // On desktop, clear any positioning styles to let CSS handle it
+          mobileToggle.style.removeProperty('position');
+          mobileToggle.style.removeProperty('top');
+          mobileToggle.style.removeProperty('transform');
+          mobileToggle.style.removeProperty('z-index');
+          mobileToggle.style.removeProperty('left');
+          mobileToggle.style.removeProperty('right');
+          console.log('[Navbar] Desktop viewport - cleared mobile toggle inline positioning');
+        }
+      }
+      
+      if (phoneBtn) {
+        // Icon sizing applies to all viewports
+        const phoneIcon = phoneBtn.querySelector('svg');
+        if (phoneIcon) {
+          phoneIcon.style.width = '24px';
+          phoneIcon.style.height = '24px';
+          phoneIcon.setAttribute('width', '24');
+          phoneIcon.setAttribute('height', '24');
+        }
+        
+        // ONLY set positioning inline styles on mobile
+        if (isMobileViewport) {
+          phoneBtn.style.setProperty('position', 'absolute', 'important');
+          phoneBtn.style.setProperty('top', '0', 'important');
+          phoneBtn.style.setProperty('bottom', '0', 'important');
+          phoneBtn.style.setProperty('margin-top', 'auto', 'important');
+          phoneBtn.style.setProperty('margin-bottom', 'auto', 'important');
+          phoneBtn.style.setProperty('transform', 'none', 'important');
+          phoneBtn.style.setProperty('z-index', '1001', 'important');
+          
+          // Clear any inline left/right so CSS can take over based on html[dir]
+          phoneBtn.style.removeProperty('left');
+          phoneBtn.style.removeProperty('right');
+          
+          console.log('[Navbar] Phone button positioning applied (mobile viewport)');
+        } else {
+          // On desktop, clear any positioning styles to let CSS handle it
+          phoneBtn.style.removeProperty('position');
+          phoneBtn.style.removeProperty('top');
+          phoneBtn.style.removeProperty('transform');
+          phoneBtn.style.removeProperty('z-index');
+          phoneBtn.style.removeProperty('left');
+          phoneBtn.style.removeProperty('right');
+          console.log('[Navbar] Desktop viewport - cleared phone button inline positioning');
+        }
+      }
+    } else {
+      console.log('[Navbar] Could not parse background color:', bgColor);
+    }
+    
+    // MOBILE MENU TOGGLE
+    // Re-query in case DOM changed (mobileToggle already declared at top of function)
+    mobileToggle = document.getElementById('mobileToggle') ||
+                   document.querySelector('.mobile-toggle') ||
+                   document.querySelector('.hamburger') ||
+                   document.querySelector('.hamburger-menu') ||
+                   document.querySelector('.menu-toggle') ||
+                   document.querySelector('.burger-menu') ||
+                   document.querySelector('[aria-label="Menu"]') ||
+                   document.querySelector('[aria-label="תפריט"]');
+    
+    // EXPANDED SEARCH: Find nav menu by ID or class
+    const navMenu = document.getElementById('navMenu') ||
+                  document.querySelector('.nav-menu') ||
+                  document.querySelector('.nav-links') ||
+                  document.querySelector('nav ul:not(.submenu)');
+    
+    if (!mobileToggle || !navMenu) {
+      console.log('[Navbar] Mobile toggle or menu not found:', { toggle: !!mobileToggle, menu: !!navMenu });
+      return;
+    }
+    
+    // Ensure navMenu has ID for CSS targeting
+    if (!navMenu.id) {
+      navMenu.id = 'navMenu';
+    }
+    
+    console.log('[Navbar] Initializing mobile menu...');
+    
+    // Remove any existing event listeners by cloning the button
+    const newToggle = mobileToggle.cloneNode(true);
+    mobileToggle.parentNode.replaceChild(newToggle, mobileToggle);
+    
+    // Toggle menu handler (shared by click and touchend)
+    function handleToggle(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const hamburgerIcon = newToggle.querySelector('.hamburger-icon');
+      const closeIcon = newToggle.querySelector('.close-icon');
+      const isActive = navMenu.classList.contains('active');
+      
+      if (isActive) {
+        // Close menu
+        navMenu.classList.remove('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'block', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'none', 'important');
+        document.body.style.overflow = '';
+        console.log('[Navbar] Menu closed');
+      } else {
+        // Open menu
+        navMenu.classList.add('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'none', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'block', 'important');
+        document.body.style.overflow = 'hidden';
+        console.log('[Navbar] Menu opened');
+      }
+    }
+    
+    // Use click for desktop/emulation and touchend as iOS Safari fallback.
+    // Prevent double-fire with a timestamp guard.
+    var lastToggleTime = 0;
+    function guardedToggle(e) {
+      var now = Date.now();
+      if (now - lastToggleTime < 300) return;
+      lastToggleTime = now;
+      handleToggle(e);
+    }
+    
+    newToggle.addEventListener('click', guardedToggle);
+    newToggle.addEventListener('touchend', guardedToggle);
+    
+    // Close menu when clicking nav links (but NOT dropdown toggles)
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        // Don't close if it's a dropdown child (unless it's a real navigation link)
+        if (this.getAttribute('href') === '#') return;
+        
+        const hamburgerIcon = newToggle.querySelector('.hamburger-icon');
+        const closeIcon = newToggle.querySelector('.close-icon');
+        
+        navMenu.classList.remove('active');
+        if (hamburgerIcon) hamburgerIcon.style.setProperty('display', 'block', 'important');
+        if (closeIcon) closeIcon.style.setProperty('display', 'none', 'important');
+        document.body.style.overflow = '';
+        console.log('[Navbar] Menu closed (link clicked)');
+      });
+    });
+    
+    // DROPDOWN MENU TOGGLE (for mobile and touch devices)
+    var dropdownToggles = navMenu.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(function(toggle) {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var parent = this.closest('.nav-dropdown');
+        if (!parent) return;
+        
+        // Close other open dropdowns at the same level
+        var siblings = parent.parentNode.querySelectorAll('.nav-dropdown.open');
+        siblings.forEach(function(sib) {
+          if (sib !== parent) sib.classList.remove('open');
+        });
+        
+        parent.classList.toggle('open');
+        console.log('[Navbar] Dropdown toggled:', parent.classList.contains('open') ? 'open' : 'closed');
+      });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-dropdown')) {
+        var openDropdowns = document.querySelectorAll('.nav-dropdown.open');
+        openDropdowns.forEach(function(dd) { dd.classList.remove('open'); });
+      }
+    });
+    
+    console.log('[Navbar] Dropdown handlers initialized for ' + dropdownToggles.length + ' dropdowns');
+    
+    // Phone button functionality (phoneBtn already declared at top of function)
+    if (phoneBtn) {
+      phoneBtn.addEventListener('click', function() {
+        // Get phone number from placeholder in page or use default
+        const phoneLinks = document.querySelectorAll('a[href^="tel:"]');
+        const phoneNumber = phoneLinks.length > 0 
+          ? phoneLinks[0].getAttribute('href').replace('tel:', '')
+          : '[business_phone]';
+        
+        window.location.href = 'tel:' + phoneNumber;
+        console.log('[Navbar] Phone button clicked');
+      });
+    }
+    
+    console.log('[Navbar] Mobile menu initialized successfully');
+    
+    // WhatsApp button visibility is now controlled via CSS (siteSettings).
+    // No JS-based desktop hiding — the button is visible on both mobile and desktop by default.
+  });
+})();
+
+</script>
+  
+  <main id="main">
+    <section class="size-guide-guide-intro-section" data-layout-spec="מדריך מידות-guide-intro" dir="rtl">
+  <div class="sgg-container">
+
+    <!-- Centered Header Block -->
+    <div class="sgg-header">
+      <span class="sgg-eyebrow">מדריך מידות</span>
+      <h1 class="sgg-title">לדעת שאתה לבוש נכון</h1>
+      <p class="sgg-subtitle">ב־DIAMANT אנחנו מאמינים שבגד טוב מתחיל במידה מדויקת. המדריך הזה נועד לעזור לך למצוא את הגזרה המושלמת — בין אם אתה קונה טי-שירט יומיומי, מכנסיים מחויטים או חולצת ערב. ואם יש ספק, אנחנו תמיד כאן.</p>
+      <div class="sgg-divider-accent" aria-hidden="true">
+        <svg data-no-icon-edit="true" aria-hidden="true" width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="0" y1="6" x2="32" y2="6" stroke="#B08D57" stroke-width="1" opacity="0.6"></line>
+          <rect x="36" y="3" width="8" height="8" transform="rotate(45 40 7)" fill="none" stroke="#B08D57" stroke-width="1" opacity="0.8"></rect>
+          <line x1="48" y1="6" x2="80" y2="6" stroke="#B08D57" stroke-width="1" opacity="0.6"></line>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Two-Column Content Area -->
+    <div class="sgg-two-col">
+
+      <!-- START column (right in RTL): How to measure -->
+      <div class="sgg-measure-col">
+        <div class="sgg-measure-card">
+          <div class="sgg-measure-label">כיצד למדוד בבית</div>
+          <h2 class="sgg-measure-title">שלושה מדדים. תוצאה מדויקת.</h2>
+          <p class="sgg-measure-desc">כל מה שאתה צריך הוא סרט מדידה גמיש ודקה אחת. עמוד זקוף, קח את המידות ישירות על הגוף — לא על הבגד — ורשום את התוצאות. כך תדע בדיוק איזה מידה להזמין.</p>
+
+          <ol class="sgg-steps-list">
+            <li class="sgg-step-item">
+              <div class="sgg-step-num">01</div>
+              <div class="sgg-step-content">
+                <h3 class="sgg-step-title">היקף חזה</h3>
+                <p class="sgg-step-text">עטוף את סרט המדידה סביב החלק הרחב ביותר של החזה, מתחת לבתי השחי. שמור על הסרט אופקי ומתוח בנוחות — לא הדוק מדי.</p>
+              </div>
+            </li>
+            <li class="sgg-step-item">
+              <div class="sgg-step-num">02</div>
+              <div class="sgg-step-content">
+                <h3 class="sgg-step-title">היקף מותניים</h3>
+                <p class="sgg-step-text">מדוד את ההיקף הצר ביותר של המותן, בדרך כלל כ־2 ס"מ מעל הטבור. זהו הבסיס למידות מכנסיים וחגורות.</p>
+              </div>
+            </li>
+            <li class="sgg-step-item">
+              <div class="sgg-step-num">03</div>
+              <div class="sgg-step-content">
+                <h3 class="sgg-step-title">אורך פנימי של רגל</h3>
+                <p class="sgg-step-text">מדוד מהמפשעה ועד לקרסול. מידה זו קריטית לבחירת אורך מכנסיים ומכנסי חליפה.</p>
+              </div>
+            </li>
+          </ol>
+
+          <div class="sgg-whatsapp-note">
+            <div class="sgg-wa-icon-wrap">
+              <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"></path>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.854L.057 23.571a.75.75 0 00.918.919l5.718-1.474A11.954 11.954 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.716 9.716 0 01-4.99-1.375l-.357-.213-3.711.957.977-3.607-.233-.371A9.718 9.718 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"></path>
+              </svg>
+            </div>
+            <p class="sgg-wa-text">לא בטוח?  ונעזור לך לבחור את המידה הנכונה.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- END column (left in RTL): Styled still-life image -->
+      <div class="sgg-image-col">
+        <div class="sgg-image-wrapper">
+          <img loading="eager" fetchpriority="high" data-placeholder="size-guide-guide-intro-image-1" data-context="Premium menswear still-life editorial photograph: a folded navy blue dress shirt resting on a clean white marble surface, a soft measuring tape casually draped across it, a small brass ruler nearby, and subtle tailoring details — thread, a few buttons — arranged with calm precision. Warm natural light, neutral background tones of cream and stone, luxury fashion editorial aesthetic." width="600" height="750" src="/assets/site-size-guide-guide-intro-image-1.webp" alt="סרט מדידה וחולצה מקופלת על משטח שיש — מדריך מידות DIAMANT" class="sgg-still-life-img">
+          <div class="sgg-image-badge" aria-hidden="true">
+            <span class="sgg-badge-text">מידה מדויקת</span>
+            <span class="sgg-badge-sub">= גזרה מושלמת</span>
+          </div>
+        </div>
+        <div class="sgg-image-caption">כל פריט ב־DIAMANT מגיע עם טבלת מידות מפורטת</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="size-guide-measurement-steps-section" data-layout-spec="מדריך מידות-measurement-steps" dir="rtl">
+  <div class="sgms-container">
+    <div class="sgms-header">
+      <span class="sgms-label">מדריך מידות</span>
+      <h2 class="sgms-title">כיצד למדוד נכון</h2>
+      <p class="sgms-subtitle">ארבעה מדדים פשוטים שיבטיחו שהבגד יתאים לכם בדיוק — בלי הפתעות</p>
+      <div class="sgms-rule-accent" aria-hidden="true">
+        <span class="sgms-rule-line"></span>
+        <svg data-no-icon-edit="true" aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="10,2 12.5,7.5 18.5,8.2 14,12.5 15.3,18.5 10,15.5 4.7,18.5 6,12.5 1.5,8.2 7.5,7.5" fill="var(--accent)" opacity="0.8"></polygon>
+        </svg>
+        <span class="sgms-rule-line"></span>
+      </div>
+    </div>
+
+    <div class="sgms-grid">
+
+      <!-- Card 1: Chest -->
+      <article class="sgms-card">
+        <div class="sgms-card-image-wrap">
+          <img loading="lazy" decoding="async" data-placeholder="size-guide-measurement-steps-image-1" data-context="Minimal clean line illustration of a male torso with a measuring tape wrapped around the chest/pectoral area, showing measurement technique. Soft warm background, premium menswear editorial style, DIAMANT brand aesthetic." width="320" height="200" src="/assets/site-size-guide-measurement-steps-image-1.webp" alt="מדידת היקף חזה לגבר">
+          <span class="sgms-step-badge">01</span>
+        </div>
+        <div class="sgms-card-body">
+          <div class="sgms-icon-row">
+            <svg data-element-type="icon" data-icon-type="svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2C8 2 5 5 5 9c0 3.5 2 6.5 5 8.3V22h4v-4.7c3-1.8 5-4.8 5-8.3 0-4-3-7-7-7z"></path>
+              <line x1="9" y1="12" x2="15" y2="12"></line>
+            </svg>
+            <h3 class="sgms-card-title">היקף חזה</h3>
+          </div>
+          <p class="sgms-card-text">עטפו את סרט המידה סביב החלק הרחב ביותר של החזה, מתחת לבתי השחי. הסרט צריך להיות מאוזן ולא להדק. הוסיפו 2 ס"מ לנוחות.</p>
+          <div class="sgms-tip">
+            <span class="sgms-tip-icon" aria-hidden="true">✦</span>
+            <small>מומלץ ללבוש חולצה דקה בזמן המדידה</small>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 2: Shoulders -->
+      <article class="sgms-card">
+        <div class="sgms-card-image-wrap">
+          <img loading="lazy" decoding="async" data-placeholder="size-guide-measurement-steps-image-2" data-context="Minimal clean line illustration of a male upper body showing measurement across the shoulders from one shoulder seam to the other, with a measuring tape. Premium menswear editorial style, soft warm stone background, DIAMANT brand aesthetic." width="320" height="200" src="/assets/site-size-guide-measurement-steps-image-2.webp" alt="מדידת רוחב כתפיים לגבר">
+          <span class="sgms-step-badge">02</span>
+        </div>
+        <div class="sgms-card-body">
+          <div class="sgms-icon-row">
+            <svg data-element-type="icon" data-icon-type="svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 12 Q12 6 20 12"></path>
+              <line x1="4" y1="12" x2="4" y2="16"></line>
+              <line x1="20" y1="12" x2="20" y2="16"></line>
+              <line x1="4" y1="14" x2="20" y2="14"></line>
+            </svg>
+            <h3 class="sgms-card-title">רוחב כתפיים</h3>
+          </div>
+          <p class="sgms-card-text">מדדו את המרחק בין נקודות הכתף — מהתפר החיצוני של הכתף הימנית לתפר החיצוני של הכתף השמאלית. זהו מדד קריטי לחולצות ולחליפות.</p>
+          <div class="sgms-tip">
+            <span class="sgms-tip-icon" aria-hidden="true">✦</span>
+            <small>עמדו ישר עם ידיים לאורך הגוף</small>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 3: Waist -->
+      <article class="sgms-card">
+        <div class="sgms-card-image-wrap">
+          <img loading="lazy" decoding="async" data-placeholder="size-guide-measurement-steps-image-3" data-context="Minimal clean line illustration of a male torso showing measurement of the waist circumference with a measuring tape at the natural waist. Premium menswear editorial style, soft warm background, DIAMANT brand aesthetic." width="320" height="200" src="/assets/site-size-guide-measurement-steps-image-3.webp" alt="מדידת היקף מותניים לגבר">
+          <span class="sgms-step-badge">03</span>
+        </div>
+        <div class="sgms-card-body">
+          <div class="sgms-icon-row">
+            <svg data-element-type="icon" data-icon-type="svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ellipse cx="12" cy="13" rx="7" ry="4"></ellipse>
+              <line x1="5" y1="13" x2="19" y2="13"></line>
+            </svg>
+            <h3 class="sgms-card-title">היקף מותניים</h3>
+          </div>
+          <p class="sgms-card-text">עטפו את סרט המידה סביב המותניים הטבעיים — מעט מעל לחגורה, בנקודה הצרה ביותר של הגזע. הסרט צריך להיות שטוח ולא לחוץ.</p>
+          <div class="sgms-tip">
+            <span class="sgms-tip-icon" aria-hidden="true">✦</span>
+            <small>אל תחזיקו את הבטן בזמן המדידה</small>
+          </div>
+        </div>
+      </article>
+
+      <!-- Card 4: Trouser Length -->
+      <article class="sgms-card">
+        <div class="sgms-card-image-wrap">
+          <img loading="lazy" decoding="async" data-placeholder="size-guide-measurement-steps-image-4" data-context="Minimal clean line illustration of male legs showing measurement of trouser inseam length from crotch to ankle, with a measuring tape. Premium menswear editorial style, soft warm stone background, DIAMANT brand aesthetic." width="320" height="200" src="/assets/site-size-guide-measurement-steps-image-4.webp" alt="מדידת אורך מכנסיים לגבר">
+          <span class="sgms-step-badge">04</span>
+        </div>
+        <div class="sgms-card-body">
+          <div class="sgms-icon-row">
+            <svg data-element-type="icon" data-icon-type="svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="3" x2="12" y2="21"></line>
+              <line x1="8" y1="3" x2="16" y2="3"></line>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="9" y1="9" x2="12" y2="9"></line>
+              <line x1="9" y1="15" x2="12" y2="15"></line>
+            </svg>
+            <h3 class="sgms-card-title">אורך מכנסיים</h3>
+          </div>
+          <p class="sgms-card-text">מדדו מהמפשעה (תפר הפנימי) עד לקרסול. עמדו ישר ברגליים צמודות. לחליפות מומלץ לציין גם האם אתם מעדיפים אורך קלאסי או עם שבר קל.</p>
+          <div class="sgms-tip">
+            <span class="sgms-tip-icon" aria-hidden="true">✦</span>
+            <small>מדדו עם הנעליים שתלבשו לרוב</small>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <div class="sgms-footer-cta">
+      <p class="sgms-footer-text">לא בטוחים במידה שלכם? הצוות שלנו כאן לעזור</p>
+      
+    </div>
+  </div>
+</section>
+
+<section class="size-guide-size-charts-section" data-layout-spec="מדריך מידות-size-charts" dir="rtl">
+  <div class="size-charts-container">
+
+    <!-- Section Header -->
+    <div class="size-charts-header">
+      <h2 class="size-charts-title">טבלאות מידות</h2>
+      <div class="size-charts-ornament" aria-hidden="true">
+        <svg data-no-icon-edit="true" aria-hidden="true" width="120" height="16" viewBox="0 0 120 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="0" y1="8" x2="50" y2="8" stroke="#B08D57" stroke-width="1" opacity="0.6"></line>
+          <rect x="54" y="4" width="8" height="8" transform="rotate(45 58 8)" fill="none" stroke="#B08D57" stroke-width="1" opacity="0.8"></rect>
+          <line x1="70" y1="8" x2="120" y2="8" stroke="#B08D57" stroke-width="1" opacity="0.6"></line>
+        </svg>
+      </div>
+      <p class="size-charts-subtitle">המידות מבוססות על מדידות גוף סטנדרטיות. שים לב כי העדפות גזרה אישיות — צמודה, רגילה או נינוחה — עשויות להשפיע על המידה המתאימה לך. במקרה של ספק, אנחנו כאן בוואטסאפ.</p>
+    </div>
+
+    <!-- TOPS TABLE -->
+    <div class="size-chart-block">
+      <div class="size-chart-block-header">
+        <span class="size-chart-category-tag">עליוניות</span>
+        <h3 class="size-chart-block-title">חולצות, פולו, טי-שירטים וסריגים</h3>
+      </div>
+
+      <div class="size-table-wrapper">
+        <table class="size-table" role="table" aria-label="טבלת מידות עליוניות">
+          <thead>
+            <tr>
+              <th scope="col" class="size-table-th size-label-col">מידה</th>
+              <th scope="col" class="size-table-th">היקף חזה (ס"מ)</th>
+              <th scope="col" class="size-table-th">היקף מותניים (ס"מ)</th>
+              <th scope="col" class="size-table-th">רוחב כתפיים (ס"מ)</th>
+              <th scope="col" class="size-table-th">אורך שרוול (ס"מ)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="size-table-row">
+              <td class="size-table-td size-label-cell"><span class="size-badge">S</span></td>
+              <td class="size-table-td">88–92</td>
+              <td class="size-table-td">76–80</td>
+              <td class="size-table-td">42–43</td>
+              <td class="size-table-td">62</td>
+            </tr>
+            <tr class="size-table-row size-table-row--alt">
+              <td class="size-table-td size-label-cell"><span class="size-badge">M</span></td>
+              <td class="size-table-td">92–98</td>
+              <td class="size-table-td">80–86</td>
+              <td class="size-table-td">44–45</td>
+              <td class="size-table-td">63</td>
+            </tr>
+            <tr class="size-table-row">
+              <td class="size-table-td size-label-cell"><span class="size-badge size-badge--accent">L</span></td>
+              <td class="size-table-td">98–104</td>
+              <td class="size-table-td">86–92</td>
+              <td class="size-table-td">46–47</td>
+              <td class="size-table-td">64</td>
+            </tr>
+            <tr class="size-table-row size-table-row--alt">
+              <td class="size-table-td size-label-cell"><span class="size-badge">XL</span></td>
+              <td class="size-table-td">104–110</td>
+              <td class="size-table-td">92–98</td>
+              <td class="size-table-td">48–49</td>
+              <td class="size-table-td">65</td>
+            </tr>
+            <tr class="size-table-row">
+              <td class="size-table-td size-label-cell"><span class="size-badge">XXL</span></td>
+              <td class="size-table-td">110–118</td>
+              <td class="size-table-td">98–106</td>
+              <td class="size-table-td">50–52</td>
+              <td class="size-table-td">66</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="size-chart-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> לגזרה צמודה — בחר מידה אחת למטה. לגזרה נינוחה — בחר מידה אחת למעלה.</p>
+    </div>
+
+    <!-- Divider -->
+    <div class="size-charts-divider" aria-hidden="true"></div>
+
+    <!-- TROUSERS TABLE -->
+    <div class="size-chart-block">
+      <div class="size-chart-block-header">
+        <span class="size-chart-category-tag">תחתוניות</span>
+        <h3 class="size-chart-block-title">מכנסיים ומכנסי ג'ינס</h3>
+      </div>
+
+      <div class="size-table-wrapper">
+        <table class="size-table" role="table" aria-label="טבלת מידות מכנסיים">
+          <thead>
+            <tr>
+              <th scope="col" class="size-table-th size-label-col">מידה</th>
+              <th scope="col" class="size-table-th">היקף מותניים (ס"מ)</th>
+              <th scope="col" class="size-table-th">היקף ירכיים (ס"מ)</th>
+              <th scope="col" class="size-table-th">אורך פנימי (ס"מ)</th>
+              <th scope="col" class="size-table-th">אינץ׳ מותניים</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="size-table-row">
+              <td class="size-table-td size-label-cell"><span class="size-badge">S / 28</span></td>
+              <td class="size-table-td">72–76</td>
+              <td class="size-table-td">90–94</td>
+              <td class="size-table-td">80</td>
+              <td class="size-table-td">28</td>
+            </tr>
+            <tr class="size-table-row size-table-row--alt">
+              <td class="size-table-td size-label-cell"><span class="size-badge">M / 30</span></td>
+              <td class="size-table-td">76–82</td>
+              <td class="size-table-td">94–100</td>
+              <td class="size-table-td">81</td>
+              <td class="size-table-td">30</td>
+            </tr>
+            <tr class="size-table-row">
+              <td class="size-table-td size-label-cell"><span class="size-badge size-badge--accent">L / 32</span></td>
+              <td class="size-table-td">82–88</td>
+              <td class="size-table-td">100–106</td>
+              <td class="size-table-td">82</td>
+              <td class="size-table-td">32</td>
+            </tr>
+            <tr class="size-table-row size-table-row--alt">
+              <td class="size-table-td size-label-cell"><span class="size-badge">XL / 34</span></td>
+              <td class="size-table-td">88–96</td>
+              <td class="size-table-td">106–114</td>
+              <td class="size-table-td">82</td>
+              <td class="size-table-td">34</td>
+            </tr>
+            <tr class="size-table-row">
+              <td class="size-table-td size-label-cell"><span class="size-badge">XXL / 36</span></td>
+              <td class="size-table-td">96–106</td>
+              <td class="size-table-td">114–122</td>
+              <td class="size-table-td">83</td>
+              <td class="size-table-td">36</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="size-chart-note"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> אורכי המכנסיים הם ממוצע. לדגמים ספציפיים עם אפשרות קיצור — ראה דף המוצר.</p>
+    </div>
+
+    <!-- Bottom CTA -->
+    <div class="size-charts-cta">
+      <div class="size-charts-cta-inner">
+        <div class="size-charts-cta-text">
+          <h3 class="size-charts-cta-title">לא בטוח במידה שלך?</h3>
+          <p class="size-charts-cta-desc">הצוות שלנו זמין לייעוץ אישי ומהיר — שלח לנו וואטסאפ ונמצא יחד את המידה המושלמת עבורך.</p>
+        </div>
+        
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="size-guide-fit-advice-section" data-layout-spec="מדריך מידות-fit-advice" dir="rtl">
+  <div class="fit-advice-container">
+
+    <div class="fit-advice-header">
+      <div class="fit-advice-ornament" aria-hidden="true">
+        <svg data-no-icon-edit="true" aria-hidden="true" width="80" height="16" viewBox="0 0 80 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="0" y1="8" x2="32" y2="8" stroke="#B08D57" stroke-width="1" opacity="0.6"></line>
+          <rect x="36" y="4" width="8" height="8" transform="rotate(45 40 8)" fill="none" stroke="#B08D57" stroke-width="1" opacity="0.8"></rect>
+          <line x1="48" y1="8" x2="80" y2="8" stroke="#B08D57" stroke-width="1" opacity="0.6"></line>
+        </svg>
+      </div>
+      <h2 class="fit-advice-title">המדריך לבחירת הפיט הנכון</h2>
+      <p class="fit-advice-subtitle">כי ההבדל בין בגד טוב לבגד מושלם הוא תמיד בגזרה</p>
+    </div>
+
+    <div class="fit-advice-grid">
+
+      <!-- Card 1: Between Sizes -->
+      <article class="fit-card">
+        <div class="fit-card-icon-wrap">
+          <svg data-element-type="icon" data-icon-type="svg" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M6 18H30M18 6L30 18L18 30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle cx="18" cy="18" r="12" stroke="currentColor" stroke-width="1" opacity="0.3"></circle>
+          </svg>
+        </div>
+        <div class="fit-card-content">
+          <span class="fit-card-label">בין מידות</span>
+          <h3 class="fit-card-title">מתלבטים בין שתי מידות?</h3>
+          <p class="fit-card-text">אם אתם בין מידה למידה, המלצתנו היא לבחור לפי האזור הרחב ביותר בגוף — כתפיים לחולצות, מותן למכנסיים. ניתן תמיד להתאים בתפירה קלה, אך לא ניתן להוסיף בד שאינו שם. הגזרה צריכה לנשום — לא לחנוק.</p>
+          <ul class="fit-card-tips">
+            <li><span class="tip-dot" aria-hidden="true"></span>חולצות: עדיפו לפי הכתפיים</li>
+            <li><span class="tip-dot" aria-hidden="true"></span>מכנסיים: עדיפו לפי המותן</li>
+            <li><span class="tip-dot" aria-hidden="true"></span>חליפות: תמיד לפי הכתפיים</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Card 2: Silhouette Preference -->
+      <article class="fit-card fit-card--accent">
+        <div class="fit-card-icon-wrap">
+          <svg data-element-type="icon" data-icon-type="svg" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M14 6C14 6 12 10 12 18C12 26 14 30 14 30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M22 6C22 6 24 10 24 18C24 26 22 30 22 30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M10 12C10 12 14 14 18 14C22 14 26 12 26 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M10 24C10 24 14 22 18 22C22 22 26 24 26 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div class="fit-card-content">
+          <span class="fit-card-label">סגנון גזרה</span>
+          <h3 class="fit-card-title">איזו גזרה מתאימה לכם?</h3>
+          <p class="fit-card-text">אופנת גברים מציעה שלוש גזרות עיקריות — כל אחת מדברת בשפה שונה. Slim Fit מחמיאה לגוף ויוצרת קו נקי ומודרני. Regular Fit מאפשרת נוחות מלאה עם מראה מסודר. Relaxed Fit מעניקה תחושת חופש עם אסתטיקה עכשווית ורגועה.</p>
+          <ul class="fit-card-tips">
+            <li><span class="tip-dot" aria-hidden="true"></span><strong>Slim Fit</strong> — קו גוף נקי, מודרני</li>
+            <li><span class="tip-dot" aria-hidden="true"></span><strong>Regular Fit</strong> — נוחות ומסודר</li>
+            <li><span class="tip-dot" aria-hidden="true"></span><strong>Relaxed Fit</strong> — עכשווי ורגוע</li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Card 3: Occasion-Based -->
+      <article class="fit-card">
+        <div class="fit-card-icon-wrap">
+          <svg data-element-type="icon" data-icon-type="svg" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="8" y="10" width="20" height="18" rx="2" stroke="currentColor" stroke-width="1.5"></rect>
+            <path d="M8 15H28" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M14 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M22 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+            <path d="M13 21H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div class="fit-card-content">
+          <span class="fit-card-label">לפי אירוע</span>
+          <h3 class="fit-card-title">גזרה לפי הזדמנות</h3>
+          <p class="fit-card-text">הבגד הנכון מותאם לא רק לגוף — אלא גם לרגע. לאירועים רשמיים, גזרה מחויטת מדברת בשפה של כבוד ובטחון. ליומיום, Regular או Relaxed מבטיחים נוחות לאורך כל היום. לאירועי בין — בחרו Slim Fit עם בד איכותי.</p>
+          <ul class="fit-card-tips">
+            <li><span class="tip-dot" aria-hidden="true"></span>אירועים רשמיים: מחויט ומוקפד</li>
+            <li><span class="tip-dot" aria-hidden="true"></span>יומיום: Regular / Relaxed</li>
+            <li><span class="tip-dot" aria-hidden="true"></span>חצי רשמי: Slim Fit איכותי</li>
+          </ul>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- WhatsApp CTA -->
+    <div class="fit-advice-cta">
+      <div class="fit-advice-cta-divider" aria-hidden="true"></div>
+      <div class="fit-advice-cta-content">
+        <p class="fit-advice-cta-text">עדיין לא בטוחים? אנחנו כאן בשבילכם.</p>
+        <p class="fit-advice-cta-sub">שלחו לנו הודעה בוואטסאפ עם המידות שלכם ואנחנו נמליץ על הגזרה המתאימה ביותר — אישית, מהיר, ובלי התחייבות.</p>
+        <a href="https://wa.me/whatsapp_handle" class="fit-advice-whatsapp-btn" target="_blank" rel="noopener noreferrer">
+          <svg data-element-type="icon" data-icon-type="svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"></path>
+          </svg>
+          שוחח איתנו בוואטסאפ
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="size-guide-contact-prompt-section" data-layout-spec="מדריך מידות-contact-prompt" dir="rtl">
+  <div class="sgcp-container">
+
+    <!-- Decorative accent line -->
+    <div class="sgcp-accent-line" aria-hidden="true">
+      <span class="sgcp-line"></span>
+      <svg data-no-icon-edit="true" aria-hidden="true" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="16,2 30,16 16,30 2,16" stroke="#B08D57" stroke-width="1.5" fill="none" opacity="0.7"></polygon>
+        <polygon points="16,8 24,16 16,24 8,16" fill="#B08D57" opacity="0.35"></polygon>
+      </svg>
+      <span class="sgcp-line"></span>
+    </div>
+
+    <!-- Main heading -->
+    <h2 class="sgcp-heading">לא בטוח במידה שלך?<br>אנחנו כאן בשבילך</h2>
+
+    <!-- Supporting paragraph -->
+    <p class="sgcp-subtext">הצוות שלנו זמין לייעוץ אישי — תענה מהיר, המלצה אמיתית, והחלפה קלה אם צריך.<br>פשוט תפנה אלינו ונדאג שתלבש בדיוק מה שמתאים לך.</p>
+
+    <!-- Primary CTA -->
+    <a href="/contact" class="sgcp-cta-btn">
+      <svg data-element-type="icon" data-icon-type="svg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M20.52 3.48A11.93 11.93 0 0 0 12 0C5.37 0 0 5.37 0 12c0 2.11.55 4.17 1.6 5.98L0 24l6.18-1.62A11.94 11.94 0 0 0 12 24c6.63 0 12-5.37 12-12 0-3.21-1.25-6.22-3.48-8.52zM12 22c-1.85 0-3.67-.5-5.24-1.44l-.38-.22-3.9 1.02 1.04-3.8-.24-.39A9.93 9.93 0 0 1 2 12C2 6.48 6.48 2 12 2c2.67 0 5.18 1.04 7.07 2.93A9.94 9.94 0 0 1 22 12c0 5.52-4.48 10-10 10zm5.47-7.36c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.27-.47-2.41-1.5-.89-.8-1.49-1.78-1.67-2.08-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.68-1.63-.93-2.23-.24-.58-.49-.5-.68-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.09 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.35z" fill="currentColor"></path>
+      </svg>
+      <span>דברו איתנו בוואטסאפ</span>
+    </a>
+
+    <!-- Reassurance micro-points -->
+    <ul class="sgcp-reassurance" role="list">
+      <li class="sgcp-reassurance-item">
+        <span class="sgcp-reassurance-icon" aria-hidden="true">
+          <svg data-element-type="icon" data-icon-type="svg" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"></circle>
+            <path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <span class="sgcp-reassurance-text">מענה תוך דקות</span>
+      </li>
+      <li class="sgcp-reassurance-item">
+        <span class="sgcp-reassurance-icon" aria-hidden="true">
+          <svg data-element-type="icon" data-icon-type="svg" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="1.5"></path>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="1.5"></path>
+            <line x1="12" y1="12" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"></line>
+          </svg>
+        </span>
+        <span class="sgcp-reassurance-text">ייעוץ אנושי ואישי</span>
+      </li>
+      <li class="sgcp-reassurance-item">
+        <span class="sgcp-reassurance-icon" aria-hidden="true">
+          <svg data-element-type="icon" data-icon-type="svg" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="1 4 1 10 7 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <span class="sgcp-reassurance-text">החלפות קלות ללא סיבוך</span>
+      </li>
+    </ul>
+
+  </div>
+</section>
+  </main>
+  
+  <footer class="site-footer" dir="rtl" aria-label="כותרת תחתונה של האתר"> <div class="footer-container"> <div class="footer-top"> <div class="footer-col footer-brand"> <img src="/assets/diamant-men-s-fashion-e-commerce-logo.webp" alt="DIAMANT" class="logo" /> <p class="footer-tagline">סטייל גברי. בגד נכון. ביטחון אמיתי.</p> <p class="footer-blurb">DIAMANT מציעה קולקציות מנהלות לגבר המודרני — מלוקים יומיומיים ועד חליפות חתן מושלמות, עם ליווי אישי בכל שלב.</p> <div class="footer-badges"> <span class="badge"><i class="fas fa-shipping-fast"></i> משלוח חינם מעל ₪299</span> <span class="badge"><i class="fas fa-headset"></i> שירות לקוחות זמין</span> </div> </div> <div class="footer-col footer-links"> <h3 class="footer-heading">ניווט מהיר</h3> <ul class="footer-nav"> <li><a href="/">בית</a></li> <li><a href="/everyday-collection">קולקציית יומיום</a></li> <li><a href="/ready-looks">לוקים מוכנים</a></li> <li><a href="/suits-grooms">חליפות וחתנים</a></li> <li><a href="/size-guide">מדריך מידות</a></li> <li><a href="/about-contact">אודות וצור קשר</a></li> </ul> </div> <div class="footer-col footer-contact-col"> <h3 class="footer-heading">יצירת קשר</h3> <ul class="footer-contact"> <li> <span class="contact-icon"><i class="fas fa-envelope"></i></span> <span class="contact-text"><a href="mailto:[business_email]">[business_email]</a></span> </li> <li> <span class="contact-icon"><i class="fas fa-phone"></i></span> <span class="contact-text"><a href="tel:[business_phone]">[business_phone]</a></span> </li> <li><a href="/"><span class="contact-icon"><i class="fas fa-map-marker-alt"></i></span> <span class="contact-text">[business_address]</span></a></li> </ul> <div class="footer-hours"> <h4 class="hours-heading">שעות פעילות</h4> <div class="hours-row"><span class="hours-day">ראשון – חמישי</span><span class="hours-time">09:00 – 20:00</span></div> <div class="hours-row"><span class="hours-day">שישי</span><span class="hours-time">09:00 – 14:00</span></div> <div class="hours-row"><span class="hours-day">שבת</span><span class="hours-time closed">סגור</span></div> </div> </div> <div class="footer-col footer-social-col"> <h3 class="footer-heading">עקבו אחרינו</h3> <div class="social-links">    </div> <div class="footer-whatsapp-cta">  </div> <div class="footer-payment"> <p class="payment-label">אמצעי תשלום</p> <div class="payment-icons"> <i class="fab fa-cc-visa" aria-label="Visa"></i> <i class="fab fa-cc-mastercard" aria-label="Mastercard"></i> <i class="fab fa-cc-paypal" aria-label="PayPal"></i> </div> </div> </div> </div> <div class="footer-divider"></div> <div class="footer-bottom"> <p class="footer-copyright">© 2026 DIAMANT. כל הזכויות שמורות.</p> <div class="footer-legal"> <a href="/privacy">מדיניות פרטיות</a> <span class="legal-sep" aria-hidden="true">|</span> <a href="/terms">תנאי שימוש</a><span class="separator">|</span>
+            <a href="/return-policy" aria-label="מדיניות החזרות">
+              מדיניות החזרות
+            </a> <span class="legal-sep" aria-hidden="true">|</span> <a href="/accessibility">נגישות</a> <span class="legal-sep" aria-hidden="true">|</span> <a href="https://zappy5.com" target="_blank" class="zappy-attribution">נוצר באמצעות Zappy</a> </div> </div> </div> </footer>
+  
+  <a href="https://wa.me/[whatsapp_handle]" class="whatsapp-float" aria-label="WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+  </a>
+  
+  <div data-integration="accessibility:toolbar"></div>
+
+    <script src="/script.js"></script>
+
+    <script id="zappy-mobile-submenu-script">
+    (function() {
+      function initMobileSubmenuToggles() {
+        if (window.innerWidth > 768) {
+          document.querySelectorAll('.mobile-submenu-toggle').forEach(function(btn) { btn.remove(); });
+          document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) { menu.classList.remove('mobile-expanded'); });
+          return;
+        }
+        var items = document.querySelectorAll('.nav-menu li:has(.sub-menu), nav li:has(.sub-menu), .navbar li:has(.sub-menu), #navMenu li:has(.sub-menu)');
+        items.forEach(function(li) {
+          if (li.querySelector('.mobile-submenu-toggle')) return;
+          var submenu = li.querySelector('.sub-menu');
+          var parentLink = li.querySelector(':scope > a');
+          if (!submenu || !parentLink) return;
+          var toggleBtn = document.createElement('button');
+          toggleBtn.className = 'mobile-submenu-toggle';
+          toggleBtn.setAttribute('aria-label', 'Toggle submenu');
+          toggleBtn.setAttribute('type', 'button');
+          parentLink.insertAdjacentElement('afterend', toggleBtn);
+          toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.sub-menu.mobile-expanded').forEach(function(menu) {
+              if (menu !== submenu) { menu.classList.remove('mobile-expanded'); var t = menu.parentElement.querySelector('.mobile-submenu-toggle'); if(t) t.classList.remove('expanded'); }
+            });
+            submenu.classList.toggle('mobile-expanded');
+            toggleBtn.classList.toggle('expanded');
+          });
+        });
+      }
+      if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initMobileSubmenuToggles); }
+      else { initMobileSubmenuToggles(); }
+      var resizeTimer; window.addEventListener('resize', function() { clearTimeout(resizeTimer); resizeTimer = setTimeout(initMobileSubmenuToggles, 250); });
+      // Re-initialize when mobile menu becomes visible (MutationObserver)
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes') {
+            var target = mutation.target;
+            if (target.classList && (target.classList.contains('active') || target.classList.contains('open'))) {
+              setTimeout(initMobileSubmenuToggles, 100);
+            }
+          }
+        });
+      });
+      setTimeout(function() {
+        document.querySelectorAll('.mobile-menu, .nav-menu, #navMenu, nav').forEach(function(menu) {
+          observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
+        });
+      }, 500);
+    })();
+    </script>
+</body>
+</html>
